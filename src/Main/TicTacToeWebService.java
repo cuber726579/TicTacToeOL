@@ -43,7 +43,7 @@ public class TicTacToeWebService implements Runnable {
             if (gameMode == 1) {
                 TicTacToe game = new TicTacToe(100);
             } else if (gameMode == 2) {
-                new TicTacToeGUI(100,in,out,null);
+                new TicTacToeGUI(100,in,out,Tool.O); // O is server
             }
         }
     }

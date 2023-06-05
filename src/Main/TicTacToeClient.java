@@ -25,7 +25,7 @@ public class TicTacToeClient {
             in = new DataInputStream(inputStream);
             out = new DataOutputStream(outputStream);
             inFromSystem = new Scanner(System.in);
-            new TicTacToeGUI(100,in,out,null);
+            new TicTacToeGUI(100,in,out,Tool.X); // X is Client
         } catch (Exception e) {
             e.printStackTrace();
         }

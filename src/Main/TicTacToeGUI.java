@@ -7,13 +7,11 @@ import java.awt.event.ActionListener;
 import java.io.*;
 
 public class TicTacToeGUI {
-    private Tool player;
-    private boolean isPlayerTurn;
+    // Indicate Server or Client
+    private Tool user;
+    private boolean isUserTurn;
 
-    private Board board;
     private TicTacToe game;
-    private Tool computer;
-    private Tool person;
     private Tool serverPlayer;
     private DataInputStream in;
     private DataOutputStream out;
@@ -34,11 +32,8 @@ public class TicTacToeGUI {
 
         this.in = in;
         this.out = out;
-        board = game.board;
 
-        player = game.player;
-        computer = game.computer;
-        person = game.person;
+        user = game.player;
 
         frame = new JFrame("Tic Tac Toe Game");
         mainPanel = new JPanel(new BorderLayout());
@@ -49,7 +44,7 @@ public class TicTacToeGUI {
                 "************************************************\n" +
                 "Let's play Tic Tac Toe!\n" +
                 "When asked for a move, click the location you want.\n" +
-                (player == person ? "You move first.\n" : "Computer moves first.\n") +
+                (game.player == user ? "You move first.\n" : "Computer moves first.\n") +
                 "************************************************\n";
 
         JOptionPane.showMessageDialog(frame, hintMessage, "Welcome to Tic Tac Toe!", JOptionPane.INFORMATION_MESSAGE);
@@ -62,7 +57,7 @@ public class TicTacToeGUI {
         frame.setSize(300, 300);
         frame.setVisible(true);
 
-        isPlayerTurn = (game.getFirstPlayer() == personTool);//这里暂时有点问题
+        isUserTurn = (game.player == this.user);
     }
 
     private void initBoard() {
@@ -74,15 +69,15 @@ public class TicTacToeGUI {
                 boardPanel.add(button);
             }
         }
-        if (player == computer) {
-            playAgentMove(in);
-        }
+//        if (user == game.player) {
+//            playAgentMove(in);
+//        }
     }
 
     private void updateBoard() {
         for (int i = 0; i < ExampleCode.GUI.Board.SIZE; i++) {
             for (int j = 0; j < Board.SIZE; j++) {
-                Tool tool = board.getToolAt(i, j);
+                Tool tool = game.board.getToolAt(i, j);
                 String buttonText = "";
                 if (tool == Tool.X) {
                     buttonText = "X";
@@ -105,40 +100,39 @@ public class TicTacToeGUI {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (isPlayerTurn) {
-                if (!board.isGameWon() && !board.isFull()) {
-                    boolean validMove = playHumanMove(row + 1, col + 1 ,out);
+            if(!isUserTurn) return;
 
-                    if (validMove && !board.isGameWon() && !board.isFull()) {
-                        isPlayerTurn = false; // 落子成功，轮到对方落子
-                        listenForOpponentMove(in); // 等待对方落子
-                        //playAgentMove(in);
-                    }
-                }
-            }
-
-            if (board.isGameWon() || board.isFull()) {
+            if (game.board.isGameWon() || game.board.isFull()) {
                 JOptionPane.showMessageDialog(frame, getGameResult(), "Game Over", JOptionPane.INFORMATION_MESSAGE);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            }
+
+            if (!game.board.isGameWon() && !game.board.isFull()) {
+                boolean validMove = playUserMove(row + 1, col + 1 ,out);
+                isUserTurn = false;
+
+//                if (validMove && !game.board.isGameWon() && !game.board.isFull()) {
+//                    playAgentMove(in);
+//                }
             }
         }
     }
 
     private String getGameResult() {
-        if (board.isGameWon()) {
-            Tool winner = board.getWinner();
-            return winner == person ? "You won!" : "Computer won!";
-        } else if (board.isFull()) {
+        if (game.board.isGameWon()) {
+            Tool winner = game.board.getWinner();
+            return winner == user ? "You won!" : "Computer won!";
+        } else if (game.board.isFull()) {
             return "It's a draw!";
         }
         return "";
     }
 
-    public boolean playHumanMove(int row, int col, DataOutputStream out) {
-        Move humanMove = game.getAMoveWithGUI(row, col, game.person);
+    public boolean playUserMove(int row, int col, DataOutputStream out) {
+        Move userMove = game.getAMoveWithGUI(row, col, game.person);
 
-        if (humanMove != null) {
-            board.handleMove(humanMove, person);
+        if (userMove != null) {
+            game.board.handleMove(userMove, person);
             updateBoard();
 
             System.out.println(row);
@@ -173,7 +167,7 @@ public class TicTacToeGUI {
             board.handleMove(agentMove, computer);
             updateBoard();
             if (!board.isGameWon() && !board.isFull()) {
-                player = game.oppositePlayer();
+                user = game.oppositePlayer();
             }
         }
     }
@@ -190,7 +184,7 @@ public class TicTacToeGUI {
                     board.handleMove(new Move(row, col), game.oppositePlayer());
                     updateBoard();
                     updateTurnLabel();
-                    isPlayerTurn = true;
+                    isUserTurn = true;
                 } catch (IOException e) {
                     e.printStackTrace();
                     break;
@@ -201,7 +195,7 @@ public class TicTacToeGUI {
 
     public void updateTurnLabel() {
         if (!board.isGameWon() && !board.isFull()) {
-            turnLabel.setText("Current turn: " + (player == person ? "Person" : "Computer"));
+            turnLabel.setText("Current turn: " + (user == person ? "Person" : "Computer"));
         } else {
             turnLabel.setText(getGameResult());
         }
