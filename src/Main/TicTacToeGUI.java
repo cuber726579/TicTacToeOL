@@ -143,7 +143,7 @@ public class TicTacToeGUI {
         }
     }
 
-    private void playAgentMove(BufferedReader in) {
+    private void playAgentMove(DataInputStream in) {
         int row,col;
         try {
             row = in.read();
