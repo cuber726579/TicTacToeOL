@@ -148,27 +148,6 @@ public class TicTacToe {
     }
     return move;
   }
-/*
-  Move getAMoveWithGUI(Integer row, Integer col, Tool player) {
-    Move move = null;
-
-    if (player == computer) {
-      System.out.println("[TicTacToe LOG] It is my move.  I am " + player);
-      move = agent.nextMove();
-    } else {
-      System.out.println("[TicTacToe LOG] It is your move.  You are " + player);
-      if (row != null && col != null) {
-        move = new Move(row, col);
-        if (!board.isValid(move)) {
-          move = null;
-          System.out.println("[TicTacToe LOG] Invalid move by user\n");
-        }
-      }
-    }
-    return move;
-  }
-
- */
 
   // Creates a move, either a random generated move or as input from the user
 //  private Move getAMove() {

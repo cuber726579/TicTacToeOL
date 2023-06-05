@@ -21,13 +21,13 @@ public class TicTacToeGUI {
     private JPanel boardPanel;
     private JButton[][] buttons;
 
-    public TicTacToeGUI(int agentIQ, DataInputStream in, DataOutputStream out, Tool personTool) {
+    public TicTacToeGUI(int agentIQ, DataInputStream in, DataOutputStream out, Tool firstPLayer) {
         this.game = new TicTacToe(agentIQ, Tool.X);
 
         this.in = in;
         this.out = out;
 
-        user = game.player;
+        user = firstPLayer;
         isUserTurn = (game.player == this.user);
 
 
@@ -46,7 +46,7 @@ public class TicTacToeGUI {
         JOptionPane.showMessageDialog(frame, hintMessage, "Welcome to Tic Tac Toe!", JOptionPane.INFORMATION_MESSAGE);
 
         initBoard();
-        listenForOpponentMove(in);
+        //listenForOpponentMove(in);
         mainPanel.add(boardPanel, BorderLayout.CENTER);
         frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -124,20 +124,18 @@ public class TicTacToeGUI {
     }
 
     public boolean playUserMove(int row, int col, DataOutputStream out) {
-        Move userMove = game.getAMoveWithGUI(row, col, game.person);
-
+        Move userMove = new Move(row,col);
+        System.out.println("Button" + row);
+        System.out.println("Button" + col);
         if (userMove != null) {
             game.board.handleMove(userMove, user);
             updateBoard();
-
-            System.out.println(row);
-            System.out.println(col);
 
             try {
                 out.writeInt(row);
                 out.writeInt(col);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
             }
 
             return true;
@@ -172,6 +170,8 @@ public class TicTacToeGUI {
                 try {
                     int row = in.readInt();
                     int col = in.readInt();
+                    System.out.println("Listener:"+row);
+                    System.out.println("Listener:"+col);
                     // update board with opponent's move
 
                     Tool opponent = (this.user == Tool.X) ? Tool.O : Tool.X;
@@ -181,8 +181,8 @@ public class TicTacToeGUI {
                     isUserTurn = true;
 
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
+//                    e.printStackTrace();
+//                    break;
                 }
             }
         }).start();
