@@ -24,7 +24,8 @@ public class TicTacToeClient {
             // Turn streams into scanners and writers.
             in = new DataInputStream(inputStream);
             out = new DataOutputStream(outputStream);
-            inFromSystem = new Scanner(System.in);
+            out.writeInt(2);
+
             new TicTacToeGUI(100,in,out,Tool.X); // X is Client
         } catch (Exception e) {
             e.printStackTrace();

@@ -21,18 +21,11 @@ public class TicTacToe {
   private static DataOutputStream out;
   private static Random generator = new Random();
 
-  public TicTacToe(int agentIQ, DataInputStream in, DataOutputStream out) {
-    this.in = in;
-    this.out = out;
-    showStartHint();
-    randomFirstPlayer();
+  public TicTacToe(int agentIQ, Tool firstPlayer) {
+    this.player = firstPlayer;
 
-    board = new Board(out);
+    board = new Board();
     agent = agentCreator(agentIQ);
-  }
-
-  public TicTacToe(BufferedReader in, PrintWriter out) {
-    this(100, in, out);
   }
 
   public void updatePlayer(Tool newPerson) {
@@ -41,30 +34,30 @@ public class TicTacToe {
     this.player = this.person == Tool.X ? this.person : this.computer;
   }
 
-  public boolean play() {
-    board.show();
-
-    boolean gameOver = false;
-    while (!gameOver) {
-      Move move = getAMove();
-      if (move == null) {
-        return false;
-      }
-
-      board.handleMove(move, player);
-
-      board.show();
-
-      if (board.isGameWon() || board.isFull())
-        gameOver = true;
-      else
-        player = oppositePlayer();
-
-    }
-
-    showGameResult();
-    return true;
-  }
+//  public boolean play() {
+//    board.show();
+//
+//    boolean gameOver = false;
+//    while (!gameOver) {
+//      Move move = getAMove();
+//      if (move == null) {
+//        return false;
+//      }
+//
+//      board.handleMove(move, player);
+//
+//      board.show();
+//
+//      if (board.isGameWon() || board.isFull())
+//        gameOver = true;
+//      else
+//        player = oppositePlayer();
+//
+//    }
+//
+//    showGameResult();
+//    return true;
+//  }
 
   private TicTacToeAgent agentCreator(int iQ) {
     TicTacToeAgent agent;
@@ -178,57 +171,57 @@ public class TicTacToe {
  */
 
   // Creates a move, either a random generated move or as input from the user
-  private Move getAMove() {
-    Move move = null;
+//  private Move getAMove() {
+//    Move move = null;
+//
+//    if (player == computer) {
+//      try {
+//        out.writeUTF("It is my move.  I am " + player);
+//        out.flush();
+//        move = agent.nextMove();
+//      } catch (Exception e) {
+//        e.printStackTrace();
+//      }
+//    } else {
+//      try {
+//        out.writeUTF("It is your move.  You are " + player);
+//        out.flush();
+//        move = getAValidMoveFromPerson();
+//      } catch (Exception e) {
+//        e.printStackTrace();
+//      }
+//    }
+//
+//    return move;
+//  }
 
-    if (player == computer) {
-      try {
-        out.writeUTF("It is my move.  I am " + player);
-        out.flush();
-        move = agent.nextMove();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    } else {
-      try {
-        out.writeUTF("It is your move.  You are " + player);
-        out.flush();
-        move = getAValidMoveFromPerson();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
 
-    return move;
-  }
-
-
-  private Move getAValidMoveFromPerson() {
-    Move move = null;
-    while (true) {
-      try {
-        out.writeUTF("Enter a row and column on one line: ");
-        out.flush();
-        out.writeUTF("-1");
-        out.flush();
-        String command = in.readUTF();
-        if (command.equals("EXIT")) {
-          return null;
-        }
-        String[] m = command.split(" ");
-        move = new Move(Integer.parseInt(m[0]), Integer.parseInt(m[1]));
-        // Generates an exception if can't make a move from r and c
-
-        if (board.isValid(move))
-          return move;
-
-        out.writeUTF("Invalid move. Try again!");
-        out.flush();
-      } catch (Exception e) {
-        out.writeUTF("Input error. Try again!");
-      }
-    }
-  }
+//  private Move getAValidMoveFromPerson() {
+//    Move move = null;
+//    while (true) {
+//      try {
+//        out.writeUTF("Enter a row and column on one line: ");
+//        out.flush();
+//        out.writeUTF("-1");
+//        out.flush();
+//        String command = in.readUTF();
+//        if (command.equals("EXIT")) {
+//          return null;
+//        }
+//        String[] m = command.split(" ");
+//        move = new Move(Integer.parseInt(m[0]), Integer.parseInt(m[1]));
+//        // Generates an exception if can't make a move from r and c
+//
+//        if (board.isValid(move))
+//          return move;
+//
+//        out.writeUTF("Invalid move. Try again!");
+//        out.flush();
+//      } catch (Exception e) {
+//        out.writeUTF("Input error. Try again!");
+//      }
+//    }
+//  }
 
   private static final String HINT_MESSAGE = "\n" +
       "************************************************\n" +

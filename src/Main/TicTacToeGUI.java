@@ -22,19 +22,14 @@ public class TicTacToeGUI {
     private JButton[][] buttons;
 
     public TicTacToeGUI(int agentIQ, DataInputStream in, DataOutputStream out, Tool personTool) {
-        this.game = new TicTacToe(agentIQ);
-
-        if (personTool != null) {
-            game.updatePlayer(personTool);
-        }
-        else {
-            game.randomFirstPlayer();
-        }
+        this.game = new TicTacToe(agentIQ, Tool.X);
 
         this.in = in;
         this.out = out;
 
         user = game.player;
+        isUserTurn = (game.player == this.user);
+
 
         frame = new JFrame("Tic Tac Toe Game");
         mainPanel = new JPanel(new BorderLayout());
@@ -58,21 +53,20 @@ public class TicTacToeGUI {
         frame.setSize(300, 300);
         frame.setVisible(true);
 
-        isUserTurn = (game.player == this.user);
     }
 
     private void initBoard() {
         for (int i = 0; i < Board.SIZE; i++) {
             for (int j = 0; j < Board.SIZE; j++) {
                 JButton button = new JButton("");
-                button.addActionListener(new ButtonClickListener(i, j,in,out));
+                button.addActionListener(new ButtonClickListener(i, j, in, out));
                 buttons[i][j] = button;
                 boardPanel.add(button);
             }
         }
-//        if (user == game.player) {
-//            playAgentMove(in);
-//        }
+        if (!isUserTurn) {
+            listenForOpponentMove(in);
+        }
     }
 
     private void updateBoard() {
@@ -101,7 +95,7 @@ public class TicTacToeGUI {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(!isUserTurn) return;
+            if (!isUserTurn) return;
 
             if (game.board.isGameWon() || game.board.isFull()) {
                 JOptionPane.showMessageDialog(frame, getGameResult(), "Game Over", JOptionPane.INFORMATION_MESSAGE);
@@ -109,7 +103,7 @@ public class TicTacToeGUI {
             }
 
             if (!game.board.isGameWon() && !game.board.isFull()) {
-                boolean validMove = playUserMove(row + 1, col + 1 ,out);
+                boolean validMove = playUserMove(row + 1, col + 1, out);
                 isUserTurn = false;
 
 //                if (validMove && !game.board.isGameWon() && !game.board.isFull()) {
@@ -147,8 +141,7 @@ public class TicTacToeGUI {
             }
 
             return true;
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog(frame, "Invalid move. Please try again.", "Invalid Move", JOptionPane.WARNING_MESSAGE);
             return false; // move was not successful
         }
@@ -177,15 +170,16 @@ public class TicTacToeGUI {
         new Thread(() -> {
             while (true) {
                 try {
-                    String moveStr = in.readUTF();
-                    String[] move = moveStr.split(",");
-                    int row = Integer.parseInt(move[0]);
-                    int col = Integer.parseInt(move[1]);
+                    int row = in.readInt();
+                    int col = in.readInt();
                     // update board with opponent's move
-                    game.board.handleMove(new Move(row, col), game.oppositePlayer());
+
+                    Tool opponent = (this.user == Tool.X) ? Tool.O : Tool.X;
+                    game.board.handleMove(new Move(row, col), opponent);
                     updateBoard();
-                    updateTurnLabel();
+//                    updateTurnLabel();
                     isUserTurn = true;
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     break;
@@ -194,12 +188,12 @@ public class TicTacToeGUI {
         }).start();
     }
 
-    public void updateTurnLabel() {
-        if (!board.isGameWon() && !board.isFull()) {
-            turnLabel.setText("Current turn: " + (user == person ? "Person" : "Computer"));
-        } else {
-            turnLabel.setText(getGameResult());
-        }
-    }
+//    public void updateTurnLabel() {
+//        if (!board.isGameWon() && !board.isFull()) {
+//            turnLabel.setText("Current turn: " + (user == person ? "Person" : "Computer"));
+//        } else {
+//            turnLabel.setText(getGameResult());
+//        }
+//    }
 
 }

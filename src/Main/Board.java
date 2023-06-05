@@ -123,9 +123,6 @@ public class Board {
     int r = move.getRow();
     int c = move.getColumn();
 
-    out.println();
-    out.println("The move for " + player + " is " + r + ", " + c);
-
     board[r - 1][c - 1] = player; // Place the player's mark on the board
     moves.add(move);
   }

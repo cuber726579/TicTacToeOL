@@ -34,14 +34,14 @@ public class TicTacToeWebService implements Runnable {
             System.out.println("-1");
             out.flush();
 
-            String command = in.readLine();
-            if (command == null || command.equals("EXIT")) {
-                return;
-            }
-            int gameMode = Integer.parseInt(command);
+            int gameMode = in.readInt();
+//            if (command == null || command.equals("EXIT")) {
+//                return;
+//            }
+//            int gameMode = Integer.parseInt(command);
 
             if (gameMode == 1) {
-                TicTacToe game = new TicTacToe(100);
+                TicTacToe game = new TicTacToe(100,Tool.X);
             } else if (gameMode == 2) {
                 new TicTacToeGUI(100,in,out,Tool.O); // O is server
             }
