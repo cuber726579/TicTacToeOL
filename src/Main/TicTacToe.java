@@ -165,8 +165,8 @@ public class TicTacToe {
     }
   }
 
-  private static BufferedReader in;
-  private static PrintWriter out;
+  private static DataInputStream in;
+  private static DataOutputStream out;
   private static Random generator = new Random();
 
   private static final String HINT_MESSAGE = "\n" +

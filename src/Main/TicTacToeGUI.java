@@ -13,6 +13,7 @@ public class TicTacToeGUI {
 
     private TicTacToe game;
     private Tool serverPlayer;
+    private Tool clientPlayer;
     private DataInputStream in;
     private DataOutputStream out;
     private JFrame frame;
