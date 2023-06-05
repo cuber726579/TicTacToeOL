@@ -76,7 +76,7 @@ public class TicTacToeGUI {
     }
 
     private void updateBoard() {
-        for (int i = 0; i < ExampleCode.GUI.Board.SIZE; i++) {
+        for (int i = 0; i < Board.SIZE; i++) {
             for (int j = 0; j < Board.SIZE; j++) {
                 Tool tool = game.board.getToolAt(i, j);
                 String buttonText = "";
