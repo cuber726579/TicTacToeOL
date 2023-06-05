@@ -135,7 +135,7 @@ public class TicTacToeGUI {
                 out.writeInt(row);
                 out.writeInt(col);
             } catch (IOException e) {
-//                throw new RuntimeException(e);
+                throw new RuntimeException(e);
             }
 
             return true;

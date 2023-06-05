@@ -31,9 +31,9 @@ public class TicTacToeWebService implements Runnable {
         int agentIQ = 100;
         while (true) {
             System.out.println(hint);
-            out.flush();
+//            out.flush();
 
-            int gameMode = in.readInt();
+            int gameMode = 2;
 //            if (command == null || command.equals("EXIT")) {
 //                return;
 //            }
