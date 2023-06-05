@@ -62,7 +62,7 @@ public class TicTacToeGUI {
         frame.setSize(300, 300);
         frame.setVisible(true);
 
-        isPlayerTurn = (game.getFirstPlayer() == personTool);
+        isPlayerTurn = (game.getFirstPlayer() == personTool);//这里暂时有点问题
     }
 
     private void initBoard() {
@@ -98,22 +98,22 @@ public class TicTacToeGUI {
         private int row;
         private int col;
 
-        public ButtonClickListener(int row, int col, BufferedReader in, PrintWriter out) {
+        public ButtonClickListener(int row, int col, DataInputStream in, DataOutputStream out) {
             this.row = row;
             this.col = col;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-//            if(player == ) {
-//
-//            }
+            if (isPlayerTurn) {
+                if (!board.isGameWon() && !board.isFull()) {
+                    boolean validMove = playHumanMove(row + 1, col + 1 ,out);
 
-            if (!board.isGameWon() && !board.isFull()) {
-                boolean validMove = playHumanMove(row + 1, col + 1 ,out);
-
-                if (validMove && !board.isGameWon() && !board.isFull()) {
-                    playAgentMove(in);
+                    if (validMove && !board.isGameWon() && !board.isFull()) {
+                        isPlayerTurn = false; // 落子成功，轮到对方落子
+                        listenForOpponentMove(in); // 等待对方落子
+                        //playAgentMove(in);
+                    }
                 }
             }
 
