@@ -8,6 +8,7 @@ import java.io.*;
 
 public class TicTacToeGUI {
     private Tool player;
+    private boolean isPlayerTurn;
 
     private Board board;
     private TicTacToe game;
@@ -54,11 +55,14 @@ public class TicTacToeGUI {
         JOptionPane.showMessageDialog(frame, hintMessage, "Welcome to Tic Tac Toe!", JOptionPane.INFORMATION_MESSAGE);
 
         initBoard();
+        listenForOpponentMove(in);
         mainPanel.add(boardPanel, BorderLayout.CENTER);
         frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(300, 300);
         frame.setVisible(true);
+
+        isPlayerTurn = (game.getFirstPlayer() == personTool);
     }
 
     private void initBoard() {
@@ -173,4 +177,34 @@ public class TicTacToeGUI {
             }
         }
     }
+
+    public void listenForOpponentMove(DataInputStream in) {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    String moveStr = in.readUTF();
+                    String[] move = moveStr.split(",");
+                    int row = Integer.parseInt(move[0]);
+                    int col = Integer.parseInt(move[1]);
+                    // update board with opponent's move
+                    board.handleMove(new Move(row, col), game.oppositePlayer());
+                    updateBoard();
+                    updateTurnLabel();
+                    isPlayerTurn = true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }).start();
+    }
+
+    public void updateTurnLabel() {
+        if (!board.isGameWon() && !board.isFull()) {
+            turnLabel.setText("Current turn: " + (player == person ? "Person" : "Computer"));
+        } else {
+            turnLabel.setText(getGameResult());
+        }
+    }
+
 }
