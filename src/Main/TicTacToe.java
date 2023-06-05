@@ -5,6 +5,8 @@ package Main;
 */
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.PrintWriter;
 import java.util.Random;
 
@@ -165,8 +167,8 @@ public class TicTacToe {
     }
   }
 
-  private static DataInputStream in;
-  private static DataOutputStream out;
+  private static BufferedReader in;
+  private static PrintWriter out;
   private static Random generator = new Random();
 
   private static final String HINT_MESSAGE = "\n" +
