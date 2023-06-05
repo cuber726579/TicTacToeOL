@@ -29,21 +29,21 @@ public class TicTacToeWebService implements Runnable {
 
     private void beginGame() throws IOException {
         int agentIQ = 100;
-        while (true) {
+        //while (true) {
             System.out.println(hint);
             out.flush();
 
-            int gameMode = in.readInt();
+            //int gameMode = in.readInt();
 //            if (command == null || command.equals("EXIT")) {
 //                return;
 //            }
 //            int gameMode = Integer.parseInt(command);
 
-            if (gameMode == 1) {
-                TicTacToe game = new TicTacToe(100,Tool.X);
-            } else if (gameMode == 2) {
-                new TicTacToeGUI(100,in,out,Tool.O); // O is server
-            }
-        }
+            //if (gameMode == 1) {
+           //     TicTacToe game = new TicTacToe(100,Tool.X, GameMode.PVE);
+            //} else if (gameMode == 2) {
+            new TicTacToeGUI(100,in,out,Tool.O, GameMode.PVP); // O is server
+            //}
+        //}
     }
 }

@@ -21,14 +21,14 @@ public class TicTacToeGUI {
     private JPanel boardPanel;
     private JButton[][] buttons;
 
-    public TicTacToeGUI(int agentIQ, DataInputStream in, DataOutputStream out, Tool firstPLayer) {
-        this.game = new TicTacToe(agentIQ, Tool.X);
+    public TicTacToeGUI(int agentIQ, DataInputStream in, DataOutputStream out, Tool firstPLayer, GameMode gameMode) {
+        this.game = new TicTacToe(agentIQ, Tool.X, gameMode);
 
         this.in = in;
         this.out = out;
 
         user = firstPLayer;
-        isUserTurn = (game.player == this.user);
+        isUserTurn = (game.curPlayer == this.user);
 
 
         frame = new JFrame("Tic Tac Toe Game");
@@ -40,7 +40,7 @@ public class TicTacToeGUI {
                 "************************************************\n" +
                 "Let's play Tic Tac Toe!\n" +
                 "When asked for a move, click the location you want.\n" +
-                (game.player == user ? "You move first.\n" : "Computer moves first.\n") +
+                (game.curPlayer == user ? "You move first.\n" : "Computer moves first.\n") +
                 "************************************************\n";
 
         JOptionPane.showMessageDialog(frame, hintMessage, "Welcome to Tic Tac Toe!", JOptionPane.INFORMATION_MESSAGE);
@@ -134,8 +134,11 @@ public class TicTacToeGUI {
             try {
                 out.writeInt(row);
                 out.writeInt(col);
+                out.flush();
             } catch (IOException e) {
 //                throw new RuntimeException(e);
+                JOptionPane.showMessageDialog(frame, "Error sending move to opponent. Game will be terminated.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             }
 
             return true;
@@ -163,30 +166,75 @@ public class TicTacToeGUI {
 //            }
 //        }
 //    }
-
+/*
     public void listenForOpponentMove(DataInputStream in) {
         new Thread(() -> {
-            while (true) {
+            final boolean[] keepRunning = {true};
+            while (keepRunning[0]) {
                 try {
                     int row = in.readInt();
                     int col = in.readInt();
-                    System.out.println("Listener:"+row);
-                    System.out.println("Listener:"+col);
-                    // update board with opponent's move
+                    System.out.println("Listener:" + row);
+                    System.out.println("Listener:" + col);
 
-                    Tool opponent = (this.user == Tool.X) ? Tool.O : Tool.X;
-                    game.board.handleMove(new Move(row, col), opponent);
-                    updateBoard();
-//                    updateTurnLabel();
-                    isUserTurn = true;
+                    SwingUtilities.invokeLater(() -> {
+                        // update board with opponent's move
+                        Tool opponent = (this.user == Tool.X) ? Tool.O : Tool.X;
+                        game.board.handleMove(new Move(row, col), opponent);
+                        updateBoard();
+                        isUserTurn = true;
 
+                        if (game.board.isGameWon() || game.board.isFull()) {
+                            JOptionPane.showMessageDialog(frame, getGameResult(), "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                            keepRunning[0] = false; // 替代break语句
+                        }
+                    });
                 } catch (IOException e) {
-//                    e.printStackTrace();
-//                    break;
+                    JOptionPane.showMessageDialog(frame, "Error receiving move from opponent. Game will be terminated.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    keepRunning[0] = false; // 替代break语句
                 }
             }
         }).start();
     }
+*/
+    public void listenForOpponentMove(DataInputStream in) {
+        final boolean[] isGameActive = {true}; // 标志游戏是否继续进行
+
+        new Thread(() -> {
+            while (isGameActive[0]) {
+                try {
+                    int row = in.readInt();
+                    int col = in.readInt();
+                    System.out.println("Listener:" + row);
+                    System.out.println("Listener:" + col);
+
+                    SwingUtilities.invokeLater(() -> {
+                        // update board with opponent's move
+                        Tool opponent = (this.user == Tool.X) ? Tool.O : Tool.X;
+                        game.board.handleMove(new Move(row, col), opponent);
+                        updateBoard();
+                        isUserTurn = true;
+
+                        if (game.board.isGameWon() || game.board.isFull()) {
+                            JOptionPane.showMessageDialog(frame, getGameResult(), "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                            isGameActive[0] = false; // 退出循环
+                        }
+                    });
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(frame, "Error receiving move from opponent. Game will be terminated.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    isGameActive[0] = false; // 退出循环
+                }
+            }
+        }).start();
+    }
+
+
+
+
 
 //    public void updateTurnLabel() {
 //        if (!board.isGameWon() && !board.isFull()) {

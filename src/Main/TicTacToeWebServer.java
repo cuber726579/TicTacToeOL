@@ -14,13 +14,15 @@ public class TicTacToeWebServer {
         ServerSocket server = new ServerSocket(SERVER_PORT);
         System.out.println("Waiting for clients to connect....");
 
-        while (true) {
+        //while (true) {
             Socket client = server.accept();
             System.out.println("Client connected.");
             TicTacToeWebService service = new TicTacToeWebService(client);
             Thread t = new Thread(service);
 
             t.start();
-        }
+        //}
+        //TicTacToeGUI serverGUI = new TicTacToeGUI(100, service.getIn(), service.getOut(), Tool.O); // O is server
+        //serverGUI.listenForOpponentMove(service.getIn());
     }
 }
