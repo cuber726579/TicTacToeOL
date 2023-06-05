@@ -132,7 +132,7 @@ public class TicTacToeGUI {
         Move userMove = game.getAMoveWithGUI(row, col, game.person);
 
         if (userMove != null) {
-            game.board.handleMove(userMove, person);
+            game.board.handleMove(userMove, user);
             updateBoard();
 
             System.out.println(row);
@@ -153,24 +153,24 @@ public class TicTacToeGUI {
         }
     }
 
-    private void playAgentMove(DataInputStream in) {
-        int row,col;
-        try {
-            row = in.read();
-            col = in.read();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        Move agentMove = new Move(row,col);
-        if (agentMove != null) {
-            board.handleMove(agentMove, computer);
-            updateBoard();
-            if (!board.isGameWon() && !board.isFull()) {
-                user = game.oppositePlayer();
-            }
-        }
-    }
+//    private void playAgentMove(DataInputStream in) {
+//        int row,col;
+//        try {
+//            row = in.read();
+//            col = in.read();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        Move agentMove = new Move(row,col);
+//        if (agentMove != null) {
+//            board.handleMove(agentMove, computer);
+//            updateBoard();
+//            if (!board.isGameWon() && !board.isFull()) {
+//                user = game.oppositePlayer();
+//            }
+//        }
+//    }
 
     public void listenForOpponentMove(DataInputStream in) {
         new Thread(() -> {
@@ -181,7 +181,7 @@ public class TicTacToeGUI {
                     int row = Integer.parseInt(move[0]);
                     int col = Integer.parseInt(move[1]);
                     // update board with opponent's move
-                    board.handleMove(new Move(row, col), game.oppositePlayer());
+                    game.board.handleMove(new Move(row, col), game.oppositePlayer());
                     updateBoard();
                     updateTurnLabel();
                     isUserTurn = true;
