@@ -4,12 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import java.io.DataInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class TicTacToeGUI {
     private Tool player;
@@ -18,14 +13,14 @@ public class TicTacToeGUI {
     private Tool computer;
     private Tool person;
 
-    private BufferedReader in;
-    private PrintWriter out;
+    private DataInputStream in;
+    private DataOutputStream out;
     private JFrame frame;
     private JPanel mainPanel;
     private JPanel boardPanel;
     private JButton[][] buttons;
 
-    public TicTacToeGUI(int agentIQ, BufferedReader in, PrintWriter out, Tool personTool) {
+    public TicTacToeGUI(int agentIQ, DataInputStream in, DataOutputStream out, Tool personTool) {
         this.game = new TicTacToe(agentIQ,in,out);
 
         if (personTool != null) {
