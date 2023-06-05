@@ -1,9 +1,6 @@
 package Main;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -11,8 +8,8 @@ import java.net.Socket;
  */
 public class TicTacToeWebService implements Runnable {
     private Socket client;
-    private BufferedReader in;
-    private PrintWriter out;
+    private DataInputStream in;
+    private DataOutputStream out;
     private static final String hint = "New game....\n1.One player\n" +
             "2.Two players\nEnter the number:";
 
@@ -22,8 +19,8 @@ public class TicTacToeWebService implements Runnable {
 
     public void run() {
         try {
-            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            out = new PrintWriter(client.getOutputStream());
+            in = new DataInputStream(client.getInputStream());
+            out = new DataOutputStream(client.getOutputStream());
             beginGame();
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,8 +30,8 @@ public class TicTacToeWebService implements Runnable {
     private void beginGame() throws IOException {
         int agentIQ = 100;
         while (true) {
-            out.println(hint);
-            out.println("-1");
+            System.out.println(hint);
+            System.out.println("-1");
             out.flush();
 
             String command = in.readLine();
@@ -44,7 +41,7 @@ public class TicTacToeWebService implements Runnable {
             int gameMode = Integer.parseInt(command);
 
             if (gameMode == 1) {
-                TicTacToe game = new TicTacToe(100,in,out);
+                TicTacToe game = new TicTacToe(100);
             } else if (gameMode == 2) {
                 new TicTacToeGUI(100,in,out,null);
             }

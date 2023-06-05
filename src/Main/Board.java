@@ -18,7 +18,7 @@ public class Board {
   private ArrayList<Move> moves;
   private static PrintWriter out;
 
-  public Board(PrintWriter out) {
+  public Board() {
     this.out = out;
     board = new Tool[SIZE][SIZE];
     clear();

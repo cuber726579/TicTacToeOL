@@ -21,7 +21,6 @@ public class TicTacToeTwoPersons {
     inFromSystem = new Scanner(System.in);
     this.in = in;
     this.out = out;
-
   }
 
   public boolean play() {

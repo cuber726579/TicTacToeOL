@@ -8,11 +8,12 @@ import java.io.*;
 
 public class TicTacToeGUI {
     private Tool player;
+
     private Board board;
     private TicTacToe game;
     private Tool computer;
     private Tool person;
-
+    private Tool serverPlayer;
     private DataInputStream in;
     private DataOutputStream out;
     private JFrame frame;
@@ -21,7 +22,7 @@ public class TicTacToeGUI {
     private JButton[][] buttons;
 
     public TicTacToeGUI(int agentIQ, DataInputStream in, DataOutputStream out, Tool personTool) {
-        this.game = new TicTacToe(agentIQ,in,out);
+        this.game = new TicTacToe(agentIQ);
 
         if (personTool != null) {
             game.updatePlayer(personTool);
@@ -74,7 +75,6 @@ public class TicTacToeGUI {
         }
     }
 
-
     private void updateBoard() {
         for (int i = 0; i < ExampleCode.GUI.Board.SIZE; i++) {
             for (int j = 0; j < Board.SIZE; j++) {
@@ -90,7 +90,6 @@ public class TicTacToeGUI {
         }
     }
 
-
     private class ButtonClickListener implements ActionListener {
         private int row;
         private int col;
@@ -102,8 +101,12 @@ public class TicTacToeGUI {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+//            if(player == ) {
+//
+//            }
+
             if (!board.isGameWon() && !board.isFull()) {
-                boolean validMove = playHumanMove(row + 1, col + 1, out);
+                boolean validMove = playHumanMove(row + 1, col + 1 ,out);
 
                 if (validMove && !board.isGameWon() && !board.isFull()) {
                     playAgentMove(in);
@@ -127,15 +130,24 @@ public class TicTacToeGUI {
         return "";
     }
 
-    public boolean playHumanMove(int row, int col, PrintWriter out) {
+    public boolean playHumanMove(int row, int col, DataOutputStream out) {
         Move humanMove = game.getAMoveWithGUI(row, col, game.person);
 
         if (humanMove != null) {
             board.handleMove(humanMove, person);
             updateBoard();
-            out.println(row);
-            out.println(col);
-            return true; // move was successful
+
+            System.out.println(row);
+            System.out.println(col);
+
+            try {
+                out.writeInt(row);
+                out.writeInt(col);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return true;
         }
         else {
             JOptionPane.showMessageDialog(frame, "Invalid move. Please try again.", "Invalid Move", JOptionPane.WARNING_MESSAGE);
@@ -157,7 +169,7 @@ public class TicTacToeGUI {
             board.handleMove(agentMove, computer);
             updateBoard();
             if (!board.isGameWon() && !board.isFull()) {
-            player = game.oppositePlayer();
+                player = game.oppositePlayer();
             }
         }
     }
