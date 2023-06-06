@@ -6,13 +6,20 @@ import java.util.Scanner;
 
 public class Client {
     private static final int SERVER_PORT = 8888;
+    private String IP;
     private static final String hint = "New game....\n1.One player\n" +
             "2.Two players\nEnter the number:";
     public static void main(String[] args) throws IOException {
         System.out.println("Try to connect....");
 
         Scanner scanner = new Scanner(System.in);
-        Socket client = new Socket("127.0.0.1", SERVER_PORT);
+        System.out.println("Please input the server IP: ");
+        String IP = scanner.next();
+        Socket client;
+        while (true) {
+            client = new Socket(IP, SERVER_PORT);
+            if(client.isConnected()) break;
+        }
         System.out.println("Connect successfully....");
 
         DataInputStream in = new DataInputStream(client.getInputStream());
