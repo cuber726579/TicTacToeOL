@@ -4,34 +4,34 @@ package Main;
    A class playing a game of TicTacToe
 */
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class TicTacToe {
-  public Tool player;
-  public Tool computer;
-  public Tool person;
+  public Tool curPlayer;
+  public Tool serverPlayer;
+  public Tool clientPlayer;
   public Board board;
   public TicTacToeAgent agent;
+  public GameMode gameMode;
   private static DataInputStream in;
   private static DataOutputStream out;
   private static Random generator = new Random();
 
-  public TicTacToe(int agentIQ, Tool firstPlayer) {
-    this.player = firstPlayer;
-
+  public TicTacToe(int agentIQ, Tool firstPlayer, GameMode gameMode) {
+    this.curPlayer = firstPlayer;
+    this.gameMode = gameMode;
     board = new Board();
     agent = agentCreator(agentIQ);
   }
 
   public void updatePlayer(Tool newPerson) {
-    this.person = newPerson;
-    this.computer = this.person == Tool.X ? Tool.O : Tool.X;
-    this.player = this.person == Tool.X ? this.person : this.computer;
+    this.clientPlayer = newPerson;
+    this.serverPlayer = this.clientPlayer == Tool.X ? Tool.O : Tool.X;
+    this.curPlayer = this.clientPlayer == Tool.X ? this.clientPlayer : this.serverPlayer;
   }
 
 //  public boolean play() {
@@ -58,6 +58,105 @@ public class TicTacToe {
 //    showGameResult();
 //    return true;
 //  }
+  /*
+  public boolean play() {
+    board.show();
+
+    boolean gameOver = false;
+    while (!gameOver) {
+      Move move = getAMove();
+      if (move == null) {
+        return false;
+      }
+
+      board.handleMove(move, player);
+
+      board.show();
+
+      if (board.isGameWon() || board.isFull())
+        gameOver = true;
+      else
+        player = oppositePlayer();
+
+    }
+
+    showGameResult();
+    return true;
+  }
+*/
+
+  public boolean play() {
+    if (gameMode == GameMode.PVE) {
+      //return playAgainstAI();
+    } else if (gameMode == GameMode.PVP) {
+      return playAgainstHuman();
+    } else {
+        System.out.println("Invalid game mode!");
+        return false;
+    }
+
+    return false;
+  }
+
+  private boolean playAgainstHuman() {
+    boolean gameOver = false;
+    while (!gameOver) {
+      board.show();
+      board.showTurn(curPlayer);
+
+      Move move = getAMoveFromSocket(curPlayer);
+      board.handleMove(move, curPlayer);
+
+      if (board.isGameWon() || board.isFull()) {
+        board.show();
+        board.showResult(board.isGameWon(), curPlayer);
+        return true;
+      }
+
+      curPlayer = oppositePlayer();
+    }
+    return true;
+  }
+
+  private Move getAMoveFromSocket(Tool player) {
+    Move move = null;
+    while (move == null) {
+      try {
+        String message = in.readUTF();
+        String[] parts = message.split(" ");
+        int row = Integer.parseInt(parts[0]);
+        int col = Integer.parseInt(parts[1]);
+        move = new Move(row, col);
+        if (!board.isValid(move)) {
+          out.writeUTF("Invalid move! Try again.");
+          move = null;
+        }
+      } catch (IOException e) {
+        System.out.println("Error reading input. Please try again.");
+      }
+    }
+    return move;
+  }
+
+  private Move getAMoveFromHuman() {
+    Move move = null;
+    while (move == null) {
+      try {
+        int row = in.readInt();  // Read the row sent by the client
+        int col = in.readInt();  // Read the col sent by the client
+        move = new Move(row, col);
+        if (!board.isValid(move)) {
+          out.writeUTF("Invalid move! Try again.");  // Send a message to the client
+          move = null;
+        }
+      } catch (IOException e) {
+        System.out.println("Error reading input. Please try again.");
+      }
+    }
+    return move;
+  }
+
+
 
   private TicTacToeAgent agentCreator(int iQ) {
     TicTacToeAgent agent;
@@ -66,10 +165,10 @@ public class TicTacToe {
         agent = new RandomAgent(board);
         break;
       case 100:
-        agent = new AIAssistance(board, computer, person);
+        agent = new AIAssistance(board, serverPlayer, clientPlayer);
         break;
       default:
-        agent = new WisdomAgent(board, computer, person, iQ);
+        agent = new WisdomAgent(board, serverPlayer, clientPlayer, iQ);
         break;
     }
     return agent;
@@ -86,23 +185,23 @@ public class TicTacToe {
 
   public void randomFirstPlayer() {
     if (generator.nextBoolean()) {
-      person = Tool.X;
-      computer = Tool.O;
+      clientPlayer = Tool.X;
+      serverPlayer = Tool.O;
     } else {
-      person = Tool.O;
-      computer = Tool.X;
+      clientPlayer = Tool.O;
+      serverPlayer = Tool.X;
     }
-    player = Tool.X;
+    curPlayer = Tool.X;
   }
 
   public Tool oppositePlayer() {
-    return (player == computer) ? person : computer;
+    return (curPlayer == serverPlayer) ? clientPlayer : serverPlayer;
   }
 
   private void showGameResult() {
       try {
           if (board.isGameWon())
-            out.writeUTF(player == person ? "You won!" : "I won!");
+            out.writeUTF(curPlayer == clientPlayer ? "You won!" : "I won!");
           else if (board.isFull())
             out.writeUTF("We tied!");
           else
@@ -122,7 +221,7 @@ public class TicTacToe {
   Move getAMoveWithGUI(Integer row, Integer col, Tool player) {
     Move move = null;
 
-    if (player == computer) {
+    if (player == serverPlayer) {
       try {
         out.writeUTF("[TicTacToe LOG] It is my move.  I am " + player);
         out.flush();

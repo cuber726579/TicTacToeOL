@@ -26,7 +26,7 @@ public class TicTacToeClient {
             out = new DataOutputStream(outputStream);
 //            out.writeInt(2);
 
-            new TicTacToeGUI(100,in,out,Tool.X); // X is Client
+            new TicTacToeGUI(100,in,out,Tool.X,GameMode.PVP); // X is Client
         } catch (Exception e) {
             e.printStackTrace();
         }

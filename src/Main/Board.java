@@ -119,6 +119,25 @@ public class Board {
     return board[r - 1][c - 1] == EMPTY;
   }
 
+  public void showResult(boolean isWon, Tool winner) {
+    if (isWon) {
+      String result = winner == Tool.X ? "X won!" : "O won!";
+      // 这里你可以选择在控制台打印结果或者使用其他方式进行显示
+      System.out.println(result);
+    } else {
+      // 游戏平局
+      // 这里你可以选择在控制台打印结果或者使用其他方式进行显示
+      System.out.println("It's a draw!");
+    }
+  }
+
+  public void showTurn(Tool currentTurn) {
+    String message = "Current turn: " + (currentTurn == Tool.X ? "X" : "O");
+    // 这里你可以选择在控制台打印结果或者使用其他方式进行显示
+    System.out.println(message);
+  }
+
+
   public void handleMove(Move move, Tool player) {
     int r = move.getRow();
     int c = move.getColumn();
