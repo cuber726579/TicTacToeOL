@@ -5,12 +5,12 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-    private static final int SERVER_PORT = 8888;
+    private static final int SERVER_PORT = 12138;
     public static void main(String[] args) throws IOException {
         System.out.println("Try to connect....");
 
         Scanner scanner = new Scanner(System.in);
-        Socket client = new Socket("127.0.0.1", SERVER_PORT);
+        Socket client = new Socket("localhost", SERVER_PORT);
         System.out.println("Connect successfully....");
 
         DataInputStream in = new DataInputStream(client.getInputStream());

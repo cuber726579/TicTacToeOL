@@ -197,10 +197,12 @@ public class TicTacToeGUI {
 
             if (!board.isGameWon() && !board.isFull()) {
                 boolean validMove = playUserMove(row + 1, col + 1);
+                //updateButtons();
+                //updateTurnLabel();
 
-                if (validMove && !board.isGameWon() && !board.isFull()) {
-                    playOpponentMove();
-                }
+                //if (validMove && !board.isGameWon() && !board.isFull()) {
+                //    playOpponentMove();
+                //}
             }
 
             if (board.isGameWon() || board.isFull()) {
@@ -219,6 +221,32 @@ public class TicTacToeGUI {
         }
         return "";
     }
+/*
+    public boolean playUserMove(int row, int col) {
+        Move userMove = new Move(row,col);
+
+        if (game.isValid(userMove)) {
+            game.handleMove(userMove, game.player);
+            this.isUserTurn = false;
+            System.out.println(isUserTurn);
+
+            System.out.println("Transmit:" + ((row-1) * 3 + col));
+            try {
+                out.writeInt((row-1) * 3 + col);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            updateButtons();
+            updateTurnLabel();
+
+            return true; // move was successful
+        }
+        else {
+            JOptionPane.showMessageDialog(frame, "Invalid move. Please try again.", "Invalid Move", JOptionPane.WARNING_MESSAGE);
+            return false; // move was not successful
+        }
+    }
+    */
 
     public boolean playUserMove(int row, int col) {
         Move userMove = new Move(row,col);
@@ -233,6 +261,7 @@ public class TicTacToeGUI {
             System.out.println("Transmit:" + ((row-1) * 3 + col));
             try {
                 out.writeInt((row-1) * 3 + col);
+                new Thread(new OpponentMoveRunnable()).start();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -269,6 +298,31 @@ public class TicTacToeGUI {
         updateButtons();
         updateTurnLabel();
     }
+
+    private class OpponentMoveRunnable implements Runnable {
+        @Override
+        public void run() {
+            try {
+                int move = in.readInt();
+                System.out.println("Receive:" + move);
+                int row = (move-1) / 3 + 1;
+                int col = (move-1) % 3 + 1;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (!isUserTurn) {
+                            game.handleMove(new Move(row, col), game.player);
+                            isUserTurn = true;
+                            updateButtons();
+                            updateTurnLabel();
+                        }
+                    }
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 
     private void updateButtons() {
         game.board.show();

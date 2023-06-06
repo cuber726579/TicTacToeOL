@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Server {
-    private static final int SERVER_PORT = 8888;
+    private static final int SERVER_PORT = 12138;
 
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
