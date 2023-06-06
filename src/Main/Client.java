@@ -18,13 +18,17 @@ public class Client {
         DataInputStream in = new DataInputStream(client.getInputStream());
         DataOutputStream out = new DataOutputStream(client.getOutputStream());
 
+        System.out.println("Randomly select first player...");
+        int icon = in.readInt();
+        Tool clientIcon = (icon == (Tool.X).ordinal()) ? Tool.X : Tool.O;
+
         // Send Game mode from client
         System.out.println(hint);
         int gameMode = scanner.nextInt();
         out.writeInt(gameMode);
 
         // Start Gaming
-        new TicTacToeGUI(100, Tool.O, client); // Default setting: Client is O}
+        new TicTacToeGUI(100, clientIcon, client); // Default setting: Client is O}
 
         System.out.println("End of client");
 //        client.close();

@@ -33,7 +33,7 @@ public class TicTacToeGUI {
     private JPanel turnPanel;
 
     public TicTacToeGUI(int agentIQ, Tool user, Socket client) {
-        this.game = new TicTacToe(agentIQ); // Client always first
+        this.game = new TicTacToe(agentIQ,user); // Client always first
 
         try {
             this.client = client;
@@ -46,9 +46,9 @@ public class TicTacToeGUI {
         this.user = user; // Client or server
         this.isUserTurn = (user == game.player);
 
-        this.board = game.board;
-        this.computer = game.server;
-        this.person = game.client;
+//        this.board = game.board;
+//        this.computer = game.server;
+//        this.person = game.client;
 
         frame = new JFrame("Tic Tac Toe Game") {
             @Override
@@ -73,7 +73,7 @@ public class TicTacToeGUI {
                 "************************************************\n" +
                 "Let's play Tic Tac Toe!\n" +
                 "When asked for a move, click the location you want.\n" +
-                (this.user == person ? "You move first.\n" : "Client moves first.\n") +
+                (this.user == game.player ? "You move first.\n" : "Client moves first.\n") +
                 "************************************************\n";
 
         JOptionPane.showMessageDialog(frame, hintMessage, "Welcome to Tic Tac Toe!", JOptionPane.INFORMATION_MESSAGE);
@@ -172,6 +172,7 @@ public class TicTacToeGUI {
                 button.setMargin(new Insets(10, 10, 10, 10));  // add margin around the button
                 button.setFont(new Font("Arial", Font.BOLD, 24));  // set font size to occupy more space in button
                 button.addActionListener(new ButtonClickListener(i, j));
+                button.setFocusPainted(false);
                 buttons[i][j] = button;
                 boardPanel.add(button);
             }
@@ -191,7 +192,7 @@ public class TicTacToeGUI {
         public void actionPerformed(ActionEvent e) {
             if(!isUserTurn) return; // 不是当前回合则退出
 
-            if (!board.isGameWon() && !board.isFull()) {
+            if (!game.board.isGameWon() && !game.board.isFull()) {
                 boolean validMove = playUserMove(row + 1, col + 1);
                 //updateButtons();
                 //updateTurnLabel();
@@ -201,7 +202,7 @@ public class TicTacToeGUI {
                 //}
             }
 
-            if (board.isGameWon() || board.isFull()) {
+            if (game.board.isGameWon() || game.board.isFull()) {
                 JOptionPane.showMessageDialog(frame, getGameResult(), "Game Over", JOptionPane.INFORMATION_MESSAGE);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             }
@@ -209,10 +210,10 @@ public class TicTacToeGUI {
     }
 
     private String getGameResult() {
-        if (board.isGameWon()) {
-            Tool winner = board.getWinner();
-            return winner == person ? "You won!" : "Computer won!";
-        } else if (board.isFull()) {
+        if (game.board.isGameWon()) {
+            Tool winner = game.board.getWinner();
+            return winner == user ? "You won!" : "Opponent won!";
+        } else if (game.board.isFull()) {
             return "It's a draw!";
         }
         return "";
@@ -342,7 +343,7 @@ public class TicTacToeGUI {
     }
 
     public void updateTurnLabel() {
-        if (!board.isGameWon() && !board.isFull()) {
+        if (!game.board.isGameWon() && !game.board.isFull()) {
             String text = isUserTurn? "Your Turn" : "Opponent turn";
             turnLabel.setText(text);
         } else {

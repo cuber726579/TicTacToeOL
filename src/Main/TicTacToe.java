@@ -18,15 +18,16 @@ public class TicTacToe {
 
   public TicTacToeAgent agent;
 
-  public TicTacToe (int agentIQ, DataInputStream in, DataOutputStream out) {
-    client = Tool.O;
-    server = Tool.X;
-    player = Tool.O;
+  public TicTacToe (int agentIQ, Tool user, DataInputStream in, DataOutputStream out) {
+    client = user;
+    server = (user == Tool.O) ? Tool.X : Tool.O;
+
+    player = Tool.X;
   
     board = new Board();
     agent = agentCreator(agentIQ);
 
-    while(true) {
+    while(!board.isFull() && !board.isGameWon()) {
       if (player == client){
         System.out.println("Listening!");
         int fromOpponent;
@@ -46,9 +47,21 @@ public class TicTacToe {
         Move serverMove = agent.nextMove();
         handleMove(serverMove, server);
 
-        row = serverMove.getRow() + 1;
-        col = serverMove.getColumn() + 1;
-        System.out.println((row-1) * 3 + col);
+        row = serverMove.getRow();
+        col = serverMove.getColumn();
+        System.out.println(row + "," +col);
+        try {
+          out.writeInt((row-1) * 3 + col);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        Move serverMove = agent.nextMove();
+        handleMove(serverMove, server);
+
+        int row = serverMove.getRow();
+        int col = serverMove.getColumn();
+        System.out.println(row + "," +col);
         try {
           out.writeInt((row-1) * 3 + col);
         } catch (IOException e) {
@@ -58,7 +71,7 @@ public class TicTacToe {
     }
   }
 
-  public TicTacToe (int agentIQ) {
+  public TicTacToe (int agentIQ , Tool user) {
     client = Tool.O;
     server = Tool.X;
     player = Tool.O;
@@ -66,10 +79,10 @@ public class TicTacToe {
     board = new Board();
     agent = agentCreator( agentIQ);
   }
-  
-  public TicTacToe () {
-    this( 100);
-  }
+
+//  public TicTacToe () {
+//    this( 100);
+//  }
 
   public void handleMove(Move move, Tool user) {
     this.board.handleMove(move,user);
