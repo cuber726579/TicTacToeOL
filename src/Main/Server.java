@@ -1,14 +1,12 @@
 package Main;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class Server {
-    private static final int SERVER_PORT = 12138;
+    private static final int SERVER_PORT = 8888;
 
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
@@ -22,11 +20,16 @@ public class Server {
         DataOutputStream out = new DataOutputStream(client.getOutputStream());
 
         // Retrieve Game mode from client
+        System.out.println("Reading game mode from client...");
+        int gameMode = in.readInt();
+        System.out.println(gameMode);
 
         // Start Gaming
-        System.out.println(client.isConnected());
-        new TicTacToeGUI(100,Tool.X,client); // Default setting: Client is X
-
-//        server.close();
+        if (gameMode == 1) {
+            new TicTacToe(100,in,out);
+        } else {
+//            System.out.println("Mode 2");
+            new TicTacToeGUI(100,Tool.X,client); // Default setting: Server is X
+        }
     }
 }

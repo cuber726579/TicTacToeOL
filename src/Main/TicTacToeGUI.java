@@ -178,10 +178,6 @@ public class TicTacToeGUI {
         }
     }
 
-
-
-
-
     private class ButtonClickListener implements ActionListener {
         private int row;
         private int col;

@@ -2,6 +2,9 @@
    A class playing a game of TicTacToe
 */
 package Main;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -11,13 +14,55 @@ public class TicTacToe {
   Tool client;
   
   Board board;
+
+
   public TicTacToeAgent agent;
+
+  public TicTacToe (int agentIQ, DataInputStream in, DataOutputStream out) {
+    client = Tool.O;
+    server = Tool.X;
+    player = Tool.O;
+  
+    board = new Board();
+    agent = agentCreator(agentIQ);
+
+    while(true) {
+      if (player == client){
+        System.out.println("Listening!");
+        int fromOpponent;
+
+        try {
+          System.out.println(in.available());
+          fromOpponent = in.readInt();
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+        int row = (fromOpponent - 1) / 3 + 1;
+        int col = (fromOpponent - 1) % 3 + 1;
+        System.out.println("Row,Col:" + row + "," + col);
+        Move opponentMove = new Move(row, col);
+        handleMove(opponentMove, client);
+
+        Move serverMove = agent.nextMove();
+        handleMove(serverMove, server);
+
+        row = serverMove.getRow() + 1;
+        col = serverMove.getColumn() + 1;
+        System.out.println((row-1) * 3 + col);
+        try {
+          out.writeInt((row-1) * 3 + col);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+  }
 
   public TicTacToe (int agentIQ) {
     client = Tool.O;
     server = Tool.X;
     player = Tool.O;
-  
+
     board = new Board();
     agent = agentCreator( agentIQ);
   }
@@ -65,11 +110,6 @@ public class TicTacToe {
     }
     return agent;
   }
-
-//  private void showStartHint() {
-//    System.out.println( HINT_MESSAGE);
-//  }
-
 
   Tool oppositePlayer() {
     return (player == server) ? client : server;
